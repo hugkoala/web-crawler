@@ -5,10 +5,10 @@ import json
 import os
 import requests
 
-class ZhihuWebCrawler(object):
+class RedditWebCrawler(object):
 
 
-    ZHIHU_URL = 'https://www.zhihu.com/'
+    REDDIT_URL = 'https://www.zhihu.com/'
 
     """docstring for ZhihuWebCrawler"""
     def __init__(self, cmdline=None):
@@ -19,7 +19,8 @@ class ZhihuWebCrawler(object):
         filename = os.path.join(path, filename)
         print('Processing:')
         resp = requests.get(
-            url = self.ZHIHU_URL + '/topic#'
+            url = self.REDDIT_URL + '/topic#' + board,
+
         )
         self.store(filename, u'{"articles": [', 'w')
 
