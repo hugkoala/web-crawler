@@ -16,7 +16,7 @@ class StockWebCrawler(object):
     def set_date(self, date):
         self.__date = date
 
-    def get_data(self, path='.'):
+    def get_datas(self, path='.'):
         filename = 'stock_' + self.get_date() + '.json'
         filename = os.path.join(path, filename)
 
@@ -27,7 +27,7 @@ class StockWebCrawler(object):
         response = requests.get(self.STOCK_URL, headers=headers)
         self.store(filename, response.text, 'w')
 
-    def parse_data(self, path='.'):
+    def parse_datas(self, path='.'):
         filename = 'stock_' + self.get_date() + '.json'
         filename = os.path.join(path, filename)
         file = self.get(filename)
@@ -46,5 +46,5 @@ class StockWebCrawler(object):
 
 if __name__ == '__main__':
     s = StockWebCrawler()
-    s.parse_data()
+    s.parse_datas()
 
