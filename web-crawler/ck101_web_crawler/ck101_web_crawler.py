@@ -1,4 +1,4 @@
-import requests, logging, time, random;
+import requests, time, random, re;
 from bs4 import BeautifulSoup as bs;
 
 BASE_URL = 'https://ck101.com/forum.php?mod=forumdisplay&fid=3419'
@@ -9,7 +9,7 @@ orderby_dict = {0: 'dateline', 1: 'replies', 2: 'views'}
 
 
 def load_web(url):
-    logging.info('===Load Web:{0}==='.format(url))
+    print('===Load Web: {0} ==='.format(url))
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
@@ -19,14 +19,17 @@ def load_web(url):
     web_res = requests.get(url, headers=headers)
     web_res.encoding = 'utf8'
     time.sleep(random.uniform(0, 2))
-    web_bs = bs(web_res, 'lxml')
+    web_bs = bs(web_res.text, 'lxml')
     return web_bs
 
 
 def get_all_page_count(web_bs):
     fd_page_bottom = web_bs.find('span', id='fd_page_bottom')
-    last_tag = fd_page_bottom.select_one('div').find('a', attrs={'class': 'last'}).text
-    return int(last_tag.split(' ')[1])
+    if fd_page_bottom.text == '':
+        return 1
+    else:
+        last_tag = fd_page_bottom.select_one('div').find('a', attrs={'class': 'last'}).text
+        return int(last_tag.split(' ')[1])
 
 
 class CK101WebCrawler(object):
@@ -58,14 +61,18 @@ class CK101WebCrawler(object):
         return url_with_args
 
     def get_finished_novel(self):
-        logging.info('===Get Novel Page===')
+        print('===Get Novel Page===')
         url = self.get_url_with_args()
-        novel_bs = load_web(url)
+        all_page_bs = load_web(url)
 
-        all_page_count = get_all_page_count(novel_bs)
+        all_page_count = get_all_page_count(all_page_bs)
 
         for i in range(all_page_count):
-            
+            novel_bs = load_web(url + '&page=' + str(i + 1))
+            novel_list = novel_bs.find('table', id='threadlisttableid').findAll('tbody', id=re.compile('^normalthread_'))
+            for idx, item in enumerate(novel_list):
+                novel_link = item.find('div', class_='blockTitle').find('a', class_='s xst')['href']
+                print(novel_link)
 
 
 
